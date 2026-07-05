@@ -34,7 +34,7 @@ class AnalyzeRequest(BaseModel):
 class AnalysisResponse(BaseModel):
     id: int
     article_url: str
-    atricle_title: str
+    article_title: str
     article_description: Optional[str]
     article_source: Optional[str]
     article_published_at: Optional[str]

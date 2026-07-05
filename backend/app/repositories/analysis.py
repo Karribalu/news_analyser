@@ -20,7 +20,7 @@ class AnalysisRepository:
         logger.debug("DB lookup by id=%s", analysis_id)
         return self.db.query(Analysis).filter(Analysis.id == analysis_id).first()
 
-    def list_all(self, analysis_id: str) -> list[Analysis]:
+    def list_all(self) -> list[Analysis]:
         logger.debug("DB query: list all analyses")
         return self.db.query(Analysis).order_by(Analysis.created_at.desc()).all()
 

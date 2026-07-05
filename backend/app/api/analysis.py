@@ -18,6 +18,7 @@ def get_analysis_repository(db: Session = Depends(get_db)) -> AnalysisRepository
     return AnalysisRepository(db)
 
 
+@router.post("", response_model=AnalysisResponse, status_code=201)
 def analyze(req: AnalyzeRequest,
             repo: AnalysisRepository = Depends(get_analysis_repository)):
     logger.info("Analyze request for article url=%r", req.article.url)
