@@ -13,6 +13,7 @@ class Sentiment(str, Enum):
 class Article(BaseModel):
     title: str
     description: Optional[str] = None
+    content: Optional[str] = None
     url: str
     source: Optional[str] = None
     published_at: Optional[str] = None

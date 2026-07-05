@@ -34,6 +34,7 @@ def fetch_articles(query: str, max_results: int = 10) -> list[Article]:
             Article(
                 title=item.get("title", ""),
                 description=item.get("description", ""),
+                content=item.get("content", ""),
                 url=item.get("url", ""),
                 source=item.get("source", {}).get("name") if isinstance(
                     item.get("source"), dict) else item.get("source"),

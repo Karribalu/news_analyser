@@ -21,7 +21,7 @@ def analyze_article(article: Article) -> dict:
 Respond with ONLY valid JSON. Do not include markdown code fences or any extra text.
 
 Title: {article.title}
-Description: {article.description or "N/A"}
+Content: {article.content or article.description or "N/A"}
 
 """
     logger.info("Sending article to OpenAI: model=%r title=%r",
