@@ -1,8 +1,11 @@
 import json
+import logging
 import re
 from openai import OpenAI
 from app.config import settings
 from app.schemas import Article, Sentiment
+
+logger = logging.getLogger(__name__)
 
 client = OpenAI(api_key=settings.openai_api_key)
 
@@ -21,6 +24,8 @@ Title: {article.title}
 Description: {article.description or "N/A"}
 
 """
+    logger.info("Sending article to OpenAI: model=%r title=%r",
+                settings.openai_model, article.title)
     response = client.chat.completions.create(
         model=settings.openai_model,
         messages=[
@@ -30,6 +35,8 @@ Description: {article.description or "N/A"}
         temperature=0.3,
         max_tokens=300
     )
+    logger.debug("OpenAI raw response: %s",
+                 response.choices[0].message.content)
 
     content = response.choices[0].message.content or "{}"
     content = re.sub(r"^```(?:json)?\s*|\s*```$", "",
@@ -38,6 +45,7 @@ Description: {article.description or "N/A"}
     try:
         result = json.loads(content)
     except json.JSONDecodeError as exc:
+        logger.error("Failed to parse OpenAI response as JSON: %s", content)
         raise ValueError(
             f"OpenAI response was not valid JSON: {content}") from exc
 
@@ -45,8 +53,12 @@ Description: {article.description or "N/A"}
     raw_sentiment = result.get("sentiment", "neutral").strip().lower()
 
     if raw_sentiment not in {s.value for s in Sentiment}:
+        logger.warning(
+            "Unexpected sentiment value %r — defaulting to 'neutral'", raw_sentiment)
         raw_sentiment = "neutral"
 
     sentiment = Sentiment(raw_sentiment)
+    logger.info("Analysis complete: sentiment=%r for title=%r",
+                sentiment.value, article.title)
 
     return {"summary": summary, "sentiment": sentiment}

@@ -1,6 +1,10 @@
+import logging
+
 import httpx
 from app.config import settings
 from app.schemas import Article
+
+logger = logging.getLogger(__name__)
 
 
 def fetch_articles(query: str, max_results: int = 10) -> list[Article]:
@@ -16,7 +20,11 @@ def fetch_articles(query: str, max_results: int = 10) -> list[Article]:
         "apikey": settings.gnews_api_key
     }
 
+    logger.debug("Calling GNews API: url=%r query=%r max=%d",
+                 settings.gnews_base_url, query, max_results)
     response = httpx.get(settings.gnews_base_url, params=params, timeout=30.0)
+    logger.info("GNews API response status=%d for query=%r",
+                response.status_code, query)
     response.raise_for_status()
     data = response.json()
 
@@ -32,4 +40,6 @@ def fetch_articles(query: str, max_results: int = 10) -> list[Article]:
                 published_at=item.get("publishedAt", "")
             )
         )
+
+    logger.info("Parsed %d article(s) from GNews response", len(articles))
     return articles
