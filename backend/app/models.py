@@ -9,6 +9,7 @@ class Analysis(Base):
     article_url = Column(String(2048), unique=True, nullable=False, index=True)
     article_title = Column(String(1024), nullable=False)
     article_description = Column(Text, nullable=True)
+    article_image = Column(String(2048), nullable=True)
     article_source = Column(String(512), nullable=True)
     article_published_at = Column(String(64), nullable=True)
     summary = Column(Text, nullable=False)

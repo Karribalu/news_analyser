@@ -2,6 +2,16 @@ import type { Article, Analysis } from "./types";
 
 const API_BASE = "/api";
 
+export async function fetchHeadlines(category = "general"): Promise<Article[]> {
+  const res = await fetch(`${API_BASE}/news/headlines?category=${category}`);
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({}));
+    throw new Error(err.detail || "Failed to fetch headlines");
+  }
+  const data = await res.json();
+  return data.articles;
+}
+
 export async function searchNews(
   query: string,
   maxResults = 10,

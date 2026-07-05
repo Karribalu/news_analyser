@@ -5,53 +5,77 @@ interface AnalysisCardProps {
   onDelete: (id: number) => void;
 }
 
-const sentimentStyles = {
-  positive: "bg-green-100 text-green-800 border-green-200",
-  neutral: "bg-slate-100 text-slate-800 border-slate-200",
-  negative: "bg-red-100 text-red-800 border-red-200",
+const sentimentConfig: Record<string, { badge: string; dot: string }> = {
+  positive: {
+    badge: "bg-green-50 text-green-700 border-green-200",
+    dot: "bg-green-500",
+  },
+  neutral: {
+    badge: "bg-slate-100 text-slate-600 border-slate-200",
+    dot: "bg-slate-400",
+  },
+  negative: {
+    badge: "bg-red-50 text-red-700 border-red-200",
+    dot: "bg-red-500",
+  },
 };
 
 export default function AnalysisCard({
   analysis,
   onDelete,
 }: AnalysisCardProps) {
+  const config = sentimentConfig[analysis.sentiment] ?? sentimentConfig.neutral;
+
   return (
-    <div className="rounded-xl border border-slate-200 bg-white p-5 shadow-sm">
-      <div className="mb-3 flex items-start justify-between gap-4">
-        <h3 className="text-lg font-semibold leading-snug text-slate-800">
-          <a
-            href={analysis.article_url}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="hover:underline"
+    <div className="flex flex-col rounded-xl border border-slate-200 bg-white shadow-sm overflow-hidden">
+      {analysis.article_image && (
+        <img
+          src={analysis.article_image}
+          alt={analysis.article_title}
+          className="h-40 w-full object-cover"
+          onError={(e) => {
+            (e.currentTarget as HTMLImageElement).style.display = "none";
+          }}
+        />
+      )}
+      <div className="flex flex-1 flex-col p-5">
+        <div className="mb-3 flex items-start justify-between gap-3">
+          <h3 className="text-sm font-semibold leading-snug text-slate-800">
+            <a
+              href={analysis.article_url}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="hover:text-blue-700"
+            >
+              {analysis.article_title}
+            </a>
+          </h3>
+          <span
+            className={`flex shrink-0 items-center gap-1.5 rounded-full border px-2.5 py-1 text-xs font-medium capitalize ${config.badge}`}
           >
-            {analysis.article_title}
-          </a>
-        </h3>
-        <span
-          className={`shrink-0 rounded-full border px-3 py-1 text-xs font-semibold capitalize ${
-            sentimentStyles[analysis.sentiment] || sentimentStyles.neutral
-          }`}
-        >
-          {analysis.sentiment}
-        </span>
-      </div>
-      <p className="mb-4 text-sm text-slate-700">{analysis.summary}</p>
-      <div className="flex items-center justify-between text-xs text-slate-500">
-        <div className="flex items-center gap-3">
-          {analysis.article_source && (
-            <span className="rounded-full bg-slate-100 px-2 py-1">
-              {analysis.article_source}
-            </span>
-          )}
-          <span>{new Date(analysis.created_at).toLocaleString()}</span>
+            <span className={`h-1.5 w-1.5 rounded-full ${config.dot}`} />
+            {analysis.sentiment}
+          </span>
         </div>
-        <button
-          onClick={() => onDelete(analysis.id)}
-          className="text-red-600 hover:text-red-800 hover:underline"
-        >
-          Delete
-        </button>
+        <p className="mb-4 flex-1 text-sm leading-relaxed text-slate-600">
+          {analysis.summary}
+        </p>
+        <div className="flex items-center justify-between text-xs text-slate-400">
+          <div className="flex items-center gap-2">
+            {analysis.article_source && (
+              <span className="font-medium text-slate-500">
+                {analysis.article_source}
+              </span>
+            )}
+            <span>{new Date(analysis.created_at).toLocaleDateString()}</span>
+          </div>
+          <button
+            onClick={() => onDelete(analysis.id)}
+            className="transition-colors hover:text-red-600"
+          >
+            Delete
+          </button>
+        </div>
       </div>
     </div>
   );

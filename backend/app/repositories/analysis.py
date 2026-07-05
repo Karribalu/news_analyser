@@ -31,6 +31,7 @@ class AnalysisRepository:
             article_url=article.url,
             article_title=article.title,
             article_description=article.description,
+            article_image=article.image,
             article_source=article.source,
             article_published_at=article.published_at,
             summary=summary,

@@ -10,6 +10,7 @@ class Settings(BaseSettings):
     openai_model: str = "gpt-4.1-nano"
     cors_origins: str = "http://localhost:5173"
     gnews_base_url: str = ""
+    gnews_headlines_url: str = "https://gnews.io/api/v4/top-headlines"
 
     class Config:
         env_file = ".env"

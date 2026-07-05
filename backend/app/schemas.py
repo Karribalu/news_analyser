@@ -14,6 +14,7 @@ class Article(BaseModel):
     title: str
     description: Optional[str] = None
     content: Optional[str] = None
+    image: Optional[str] = None
     url: str
     source: Optional[str] = None
     published_at: Optional[str] = None
@@ -37,6 +38,7 @@ class AnalysisResponse(BaseModel):
     article_url: str
     article_title: str
     article_description: Optional[str]
+    article_image: Optional[str]
     article_source: Optional[str]
     article_published_at: Optional[str]
     summary: str
