@@ -47,7 +47,8 @@ def test_analyze_article_negative_sentiment():
 
 def test_analyze_article_strips_markdown_fences():
     mock_completion = MagicMock()
-    mock_completion.choices[0].message.content = "```json\n" + VALID_JSON + "\n```"
+    mock_completion.choices[0].message.content = "```json\n" + \
+        VALID_JSON + "\n```"
 
     with patch("app.services.openai.client") as mock_client:
         mock_client.chat.completions.create.return_value = mock_completion
@@ -107,7 +108,8 @@ def test_analyze_article_raises_when_no_api_key(monkeypatch):
 
 
 def test_analyze_article_passes_correct_model(monkeypatch):
-    monkeypatch.setattr("app.services.openai.settings.openai_model", "gpt-test-model")
+    monkeypatch.setattr(
+        "app.services.openai.settings.openai_model", "gpt-test-model")
     mock_completion = MagicMock()
     mock_completion.choices[0].message.content = VALID_JSON
 
@@ -119,7 +121,8 @@ def test_analyze_article_passes_correct_model(monkeypatch):
 
 
 def test_analyze_article_includes_title_in_prompt():
-    article = Article(title="Unique Article Headline XYZ", url="https://example.com/article")
+    article = Article(title="Unique Article Headline XYZ",
+                      url="https://example.com/article")
     mock_completion = MagicMock()
     mock_completion.choices[0].message.content = VALID_JSON
 

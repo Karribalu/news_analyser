@@ -65,7 +65,8 @@ def test_fetch_articles_empty_response():
 
 def test_fetch_articles_multiple_articles():
     mock_resp = MagicMock()
-    mock_resp.json.return_value = {"articles": [{**ITEM, "url": f"https://example.com/{i}"} for i in range(3)]}
+    mock_resp.json.return_value = {"articles": [
+        {**ITEM, "url": f"https://example.com/{i}"} for i in range(3)]}
 
     with patch("app.services.news.httpx.get", return_value=mock_resp):
         articles = fetch_articles("multi")
