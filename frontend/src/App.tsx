@@ -25,6 +25,7 @@ export default function App() {
   const [analyzingUrl, setAnalyzingUrl] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [headlinePage, setHeadlinePage] = useState(1);
+  const [headlinesTotal, setHeadlinesTotal] = useState(0);
   const [headlineTotalPages, setHeadlineTotalPages] = useState(1);
   const [searchPage, setSearchPage] = useState(1);
   const [searchTotalPages, setSearchTotalPages] = useState(1);
@@ -43,6 +44,7 @@ export default function App() {
       setHeadlines(data.articles);
       setHeadlinePage(data.page);
       setHeadlineTotalPages(data.total_pages);
+      setHeadlinesTotal(data.total);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Failed to load headlines");
     } finally {
@@ -144,6 +146,7 @@ export default function App() {
             onClick={() => setActiveTab("headlines")}
           >
             Headlines
+            {headlinesTotal > 0 && <Badge color="blue">{headlinesTotal}</Badge>}
           </TabPill>
           {query && (
             <TabPill
@@ -160,7 +163,7 @@ export default function App() {
           >
             History
             {analyses.length > 0 && (
-              <Badge color="slate">{analyses.length}</Badge>
+              <Badge color="blue">{analyses.length}</Badge>
             )}
           </TabPill>
         </div>

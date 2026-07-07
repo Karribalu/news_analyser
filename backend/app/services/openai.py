@@ -15,7 +15,7 @@ def analyze_article(article: Article) -> dict:
         raise ValueError("OPENAI_API_KEY is not configured")
 
     prompt = f""" You are a helpful news assistant. Read the article below and produce a JSON object with exactly two keys:
-- "summary": a concise 2-3 sentence summary of the article.
+- "summary": a concise 6-7 sentence summary of the article.
 - "sentiment": one of "positive", "neutral", or "negative" based on the overall tone of the article.
 
 Respond with ONLY valid JSON. Do not include markdown code fences or any extra text.
