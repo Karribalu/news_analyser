@@ -29,6 +29,14 @@ class SearchResponse(BaseModel):
     articles: list[Article]
 
 
+class PaginatedArticleResponse(BaseModel):
+    articles: list[Article]
+    total: int
+    page: int
+    page_size: int
+    total_pages: int
+
+
 class AnalyzeRequest(BaseModel):
     article: Article
 
