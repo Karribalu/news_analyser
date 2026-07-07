@@ -8,6 +8,14 @@ export interface Article {
   published_at?: string;
 }
 
+export interface PaginatedArticleResponse {
+  articles: Article[];
+  total: number;
+  page: number;
+  page_size: number;
+  total_pages: number;
+}
+
 export interface Analysis {
   id: number;
   article_url: string;

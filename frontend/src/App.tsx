@@ -24,17 +24,25 @@ export default function App() {
   const [loadingSearch, setLoadingSearch] = useState(false);
   const [analyzingUrl, setAnalyzingUrl] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [headlinePage, setHeadlinePage] = useState(1);
+  const [headlineTotalPages, setHeadlineTotalPages] = useState(1);
+  const [searchPage, setSearchPage] = useState(1);
+  const [searchTotalPages, setSearchTotalPages] = useState(1);
+  const [searchTotal, setSearchTotal] = useState(0);
 
   useEffect(() => {
     loadHeadlines();
     loadAnalyses();
   }, []);
 
-  const loadHeadlines = async () => {
+  const loadHeadlines = async (page = 1) => {
     setLoadingHeadlines(true);
+    setError(null);
     try {
-      const data = await fetchHeadlines();
-      setHeadlines(data);
+      const data = await fetchHeadlines("general", page);
+      setHeadlines(data.articles);
+      setHeadlinePage(data.page);
+      setHeadlineTotalPages(data.total_pages);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Failed to load headlines");
     } finally {
@@ -51,20 +59,29 @@ export default function App() {
     }
   };
 
-  const handleSearch = async (q: string) => {
-    setQuery(q);
+  const handleSearch = async (q: string, page = 1) => {
+    if (page === 1) {
+      setQuery(q);
+      setSearchPage(1);
+    }
     setError(null);
     setLoadingSearch(true);
     setActiveTab("search");
     try {
-      const data = await searchNews(q);
-      setSearchResults(data);
+      const data = await searchNews(q, page);
+      setSearchResults(data.articles);
+      setSearchPage(data.page);
+      setSearchTotalPages(data.total_pages);
+      setSearchTotal(data.total);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Search failed");
     } finally {
       setLoadingSearch(false);
     }
   };
+
+  const handleHeadlinePage = (page: number) => loadHeadlines(page);
+  const handleSearchPage = (page: number) => handleSearch(query, page);
 
   const handleAnalyze = async (article: Article) => {
     setError(null);
@@ -134,9 +151,7 @@ export default function App() {
               onClick={() => setActiveTab("search")}
             >
               Results
-              {searchResults.length > 0 && (
-                <Badge color="blue">{searchResults.length}</Badge>
-              )}
+              {searchTotal > 0 && <Badge color="blue">{searchTotal}</Badge>}
             </TabPill>
           )}
           <TabPill
@@ -168,16 +183,31 @@ export default function App() {
                 : `No articles found for "${query}".`}
             </EmptyState>
           ) : (
-            <div className="grid gap-4 sm:grid-cols-2">
-              {currentArticles.map((article) => (
-                <ArticleCard
-                  key={article.url}
-                  article={article}
-                  onAnalyze={handleAnalyze}
-                  analyzing={analyzingUrl === article.url}
-                />
-              ))}
-            </div>
+            <>
+              <div className="grid gap-4 sm:grid-cols-2">
+                {currentArticles.map((article) => (
+                  <ArticleCard
+                    key={article.url}
+                    article={article}
+                    onAnalyze={handleAnalyze}
+                    analyzing={analyzingUrl === article.url}
+                  />
+                ))}
+              </div>
+              <Pagination
+                page={activeTab === "headlines" ? headlinePage : searchPage}
+                totalPages={
+                  activeTab === "headlines"
+                    ? headlineTotalPages
+                    : searchTotalPages
+                }
+                onPage={
+                  activeTab === "headlines"
+                    ? handleHeadlinePage
+                    : handleSearchPage
+                }
+              />
+            </>
           ))}
 
         {/* History grid */}
@@ -242,6 +272,39 @@ function Badge({
     >
       {children}
     </span>
+  );
+}
+
+function Pagination({
+  page,
+  totalPages,
+  onPage,
+}: {
+  page: number;
+  totalPages: number;
+  onPage: (p: number) => void;
+}) {
+  if (totalPages <= 1) return null;
+  return (
+    <div className="mt-6 flex items-center justify-center gap-3">
+      <button
+        disabled={page <= 1}
+        onClick={() => onPage(page - 1)}
+        className="rounded-lg border border-slate-200 bg-white px-3 py-1.5 text-sm font-medium text-slate-600 shadow-sm transition hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-40"
+      >
+        ← Prev
+      </button>
+      <span className="text-sm text-slate-500">
+        Page {page} of {totalPages}
+      </span>
+      <button
+        disabled={page >= totalPages}
+        onClick={() => onPage(page + 1)}
+        className="rounded-lg border border-slate-200 bg-white px-3 py-1.5 text-sm font-medium text-slate-600 shadow-sm transition hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-40"
+      >
+        Next →
+      </button>
+    </div>
   );
 }
 

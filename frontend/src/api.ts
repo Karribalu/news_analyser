@@ -1,32 +1,41 @@
-import type { Article, Analysis } from "./types";
+import type { Article, Analysis, PaginatedArticleResponse } from "./types";
 
 const API_BASE = import.meta.env.VITE_API_URL ?? "";
 
-export async function fetchHeadlines(category = "general"): Promise<Article[]> {
-  const res = await fetch(`${API_BASE}/news/headlines?category=${category}`);
+export async function fetchHeadlines(
+  category = "general",
+  page = 1,
+  pageSize = 10,
+): Promise<PaginatedArticleResponse> {
+  const params = new URLSearchParams({
+    category,
+    page: String(page),
+    page_size: String(pageSize),
+  });
+  const res = await fetch(`${API_BASE}/news/headlines?${params}`);
   if (!res.ok) {
     const err = await res.json().catch(() => ({}));
     throw new Error(err.detail || "Failed to fetch headlines");
   }
-  const data = await res.json();
-  return data.articles;
+  return res.json();
 }
 
 export async function searchNews(
   query: string,
-  maxResults = 10,
-): Promise<Article[]> {
+  page = 1,
+  pageSize = 10,
+): Promise<PaginatedArticleResponse> {
   const params = new URLSearchParams({
     q: query,
-    max_results: String(maxResults),
+    page: String(page),
+    page_size: String(pageSize),
   });
   const res = await fetch(`${API_BASE}/news?${params}`);
   if (!res.ok) {
     const err = await res.json().catch(() => ({}));
     throw new Error(err.detail || "Failed to fetch news");
   }
-  const data = await res.json();
-  return data.articles;
+  return res.json();
 }
 
 export async function analyzeArticle(article: Article): Promise<Analysis> {
